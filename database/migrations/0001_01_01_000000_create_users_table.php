@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('no_hp');
             $table->enum('role', ['admin', 'pasien', 'dokter']);
             $table->string('no_ktp');
-            $table->string('no_rm');
+            $table->string('no_rm')->nullable(); 
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
