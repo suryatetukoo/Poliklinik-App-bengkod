@@ -23,6 +23,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     
     // Resource route untuk poli disatukan di dalam group admin ini
     Route::resource('polis', PoliController::class);
+    Route::resource('dokter', App\Http\Controllers\Admin\DokterController::class)->names('dokter');
+    Route::resource('pasien', App\Http\Controllers\Admin\PasienController::class)->names('pasien');
+    Route::resource('obat', App\Http\Controllers\Admin\ObatController::class)->names('obat');
 });
 
 // --- Rute Dokter ---

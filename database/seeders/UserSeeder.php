@@ -3,18 +3,13 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // nama, email, password, role, alamat, no_hp, no_ktp
         $users = [
             [
                 'nama' => 'Admin',
@@ -24,6 +19,7 @@ class UserSeeder extends Seeder
                 'alamat' => 'Jl. Admin Sejahtera No. 1',
                 'no_hp' => '081111111111',
                 'no_ktp' => '1111111111111111',
+                'id_poli' => null,
             ],
             [
                 'nama' => 'Dokter',
@@ -33,6 +29,7 @@ class UserSeeder extends Seeder
                 'alamat' => 'Jl. Dokter Sehat No. 2',
                 'no_hp' => '082222222222',
                 'no_ktp' => '2222222222222222',
+                'id_poli' => null,
             ],
             [
                 'nama' => 'Pasien',
@@ -42,11 +39,15 @@ class UserSeeder extends Seeder
                 'alamat' => 'Jl. Pasien Sembuh No. 3',
                 'no_hp' => '083333333333',
                 'no_ktp' => '3333333333333333',
+                'id_poli' => null,
             ],
         ];
 
         foreach ($users as $user) {
-            User::create($user);
+            User::updateOrCreate(
+                ['email' => $user['email']],
+                $user
+            );
         }
     }
 }
