@@ -33,6 +33,7 @@ Route::middleware(['auth', 'role:dokter'])->prefix('dokter')->group(function () 
     Route::get('/dashboard', function () {
         return view('dokter.dashboard');
     })->name('dokter.dashboard');
+    Route::resource('jadwal-periksa', App\Http\Controllers\Dokter\JadwalPeriksaController::class)->names('jadwal-periksa');
 });
 
 // --- Rute Pasien ---
@@ -40,4 +41,6 @@ Route::middleware(['auth', 'role:pasien'])->prefix('pasien')->group(function () 
     Route::get('/dashboard', function () {
         return view('pasien.dashboard');
     })->name('pasien.dashboard');
+    Route::get('/daftar', [App\Http\Controllers\Pasien\PoliController::class, 'get'])->name('pasien.daftar');
+    Route::post('/daftar', [App\Http\Controllers\Pasien\PoliController::class, 'submit'])->name('pasien.daftar.submit');
 });

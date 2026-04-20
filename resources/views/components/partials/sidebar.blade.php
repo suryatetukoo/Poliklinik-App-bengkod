@@ -49,7 +49,6 @@
                     Dashboard Admin
                 </a>
 
-                {{-- Dipindahkan ke sini agar sejajar dengan menu admin lainnya --}}
                 <a href="{{ route('polis.index') }}"
                     class="{{ $baseLink }} {{ request()->routeIs('polis.*') ? $active : $inactive }}">
                     <i class="fas fa-hospital w-4 text-center"></i>
@@ -72,6 +71,16 @@
                 class="{{ $baseLink }} {{ request()->routeIs('obat.*') ? $active : $inactive }}">
                 <i class="fas fa-pills w-4 text-center"></i>
                 Manajemen Obat
+
+                <a href="{{ route('jadwal-periksa.index') }}"
+                class="{{ $baseLink }} {{ request()->routeIs('jadwal-periksa.*') ? $active : $inactive }}">
+                <i class="fas fa-stethoscope w-4 text-center"></i>
+                Jadwal Periksa
+
+                <a href="{{ route('pasien.daftar') }}"
+                    class="{{ $baseLink }} {{ request()->routeIs('pasien.daftar') ? $active : $inactive }}">
+                    <i class="fas fa-house-medical w-4 text-center"></i>
+                    Pendaftaran Periksa
                 </a>
             </div>
         @endif
@@ -88,6 +97,12 @@
                     <i class="fas fa-house-medical w-4 text-center"></i>
                     Dashboard Pasien
                 </a>
+
+                <a href="{{ route('pasien.daftar') }}"
+                    class="{{ $baseLink }} {{ request()->routeIs('pasien.daftar') ? $active : $inactive }}">
+                    <i class="fas fa-clipboard-list w-4 text-center"></i>
+                    Pendaftaran Periksa
+                </a>
             </div>
         @endif
 
@@ -102,6 +117,12 @@
                     class="{{ $baseLink }} {{ request()->routeIs('dokter.dashboard') ? $active : $inactive }}">
                     <i class="fas fa-stethoscope w-4 text-center"></i>
                     Dashboard Dokter
+                </a>
+
+                <a href="{{ route('jadwal-periksa.index') }}"
+                    class="{{ $baseLink }} {{ request()->routeIs('jadwal-periksa.*') ? $active : $inactive }}">
+                    <i class="fas fa-calendar-check w-4 text-center"></i>
+                    Jadwal Periksa
                 </a>
             </div>
         @endif
