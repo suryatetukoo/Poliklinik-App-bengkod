@@ -14,13 +14,13 @@ class PoliController extends Controller
     public function get()
     {
         $user = Auth::user();
-        $polis = Poli::all();
-        $jadwal = JadwalPeriksa::with('dokter', 'dokter.poli')->get();
+        $polis = Poli::with(['dokters.jadwalPeriksa'])->get(); 
+        $jadwals = JadwalPeriksa::with('dokter', 'dokter.poli')->get();
 
         return view('pasien.daftar', [
-            'user'   => $user,
-            'polis'  => $polis,
-            'jadwals'=> $jadwal,
+            'user'    => $user,
+            'polis'   => $polis,
+            'jadwals' => $jadwals,
         ]);
     }
 
@@ -33,17 +33,32 @@ class PoliController extends Controller
             'id_pasien' => 'required|exists:users,id',
         ]);
 
+        // ==========================================
+        // VALIDASI: cek apakah pasien sudah daftar
+        // di jadwal yang sama dan belum diperiksa
+        // ==========================================
+        $sudahDaftar = DaftarPoli::where('id_pasien', $request->id_pasien)
+            ->where('id_jadwal', $request->id_jadwal)
+            ->whereDoesntHave('periksas') // belum diperiksa
+            ->exists();
+
+        if ($sudahDaftar) {
+            return redirect()->back()
+                ->with('message', 'Anda sudah terdaftar di jadwal ini dan belum diperiksa.')
+                ->with('type', 'error');
+        }
+
         $jumlahSudahDaftar = DaftarPoli::where('id_jadwal', $request->id_jadwal)->count();
 
-        $daftar = DaftarPoli::create([
-            'id_pasien' => $request->id_pasien,
-            'id_jadwal' => $request->id_jadwal,
-            'keluhan'   => $request->keluhan,
-            'no_antrian'=> $jumlahSudahDaftar + 1,
+        DaftarPoli::create([
+            'id_pasien'  => $request->id_pasien,
+            'id_jadwal'  => $request->id_jadwal,
+            'keluhan'    => $request->keluhan,
+            'no_antrian' => $jumlahSudahDaftar + 1,
         ]);
 
         return redirect()->back()
-            ->with('message', 'Berhasil Mendaftar ke Poli')
+            ->with('message', 'Berhasil Mendaftar ke Poli! Nomor antrian: ' . ($jumlahSudahDaftar + 1))
             ->with('type', 'success');
     }
 }

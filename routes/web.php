@@ -33,6 +33,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::resource('dokter', App\Http\Controllers\Admin\DokterController::class)->names('dokter');
     Route::resource('pasien', App\Http\Controllers\Admin\PasienController::class)->names('pasien');
     Route::resource('obat', App\Http\Controllers\Admin\ObatController::class)->names('obat');
+    Route::post('obat/{id}/tambah-stok', [ObatController::class, 'tambahStok'])->name('obat.tambahStok');
+    Route::post('obat/{id}/kurangi-stok', [ObatController::class, 'kurangiStok'])->name('obat.kurangiStok');
 });
 
 // --- Rute Dokter ---

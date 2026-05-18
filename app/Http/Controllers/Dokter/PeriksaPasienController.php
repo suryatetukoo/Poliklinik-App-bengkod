@@ -35,27 +35,50 @@ class PeriksaPasienController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'obat_json' => 'required',
-            'catatan' => 'nullable|string',
-            'biaya_periksa' => 'required|integer',
+            'obat_json'      => 'required',
+            'catatan'        => 'nullable|string',
+            'biaya_periksa'  => 'required|integer',
         ]);
 
         $obatIds = json_decode($request->obat_json, true);
 
+        // ==========================================
+        // VALIDASI STOK SEMUA OBAT SEBELUM DISIMPAN
+        // ==========================================
+        foreach ($obatIds as $idObat) {
+            $obat = Obat::findOrFail($idObat);
+
+            if ($obat->stok <= 0) {
+                return redirect()->back()
+                    ->with('message', 'Stok obat "' . $obat->nama_obat . '" habis! Tidak bisa diresepkan.')
+                    ->with('type', 'error');
+            }
+        }
+
+        // Simpan data periksa
         $periksa = Periksa::create([
             'id_daftar_poli' => $request->id_daftar_poli,
-            'tgl_periksa' => now(),
-            'catatan' => $request->catatan,
-            'biaya_periksa' => $request->biaya_periksa + 150000,
+            'tgl_periksa'    => now(),
+            'catatan'        => $request->catatan,
+            'biaya_periksa'  => $request->biaya_periksa + 150000,
         ]);
 
+        // Simpan detail periksa & kurangi stok otomatis
         foreach ($obatIds as $idObat) {
             DetailPeriksa::create([
                 'id_periksa' => $periksa->id,
-                'id_obat' => $idObat,
+                'id_obat'    => $idObat,
             ]);
+
+            // ==========================================
+            // OTOMATIS KURANGI STOK SAAT OBAT DIRESEPKAN
+            // ==========================================
+            $obat = Obat::findOrFail($idObat);
+            $obat->stok -= 1;
+            $obat->save();
         }
 
-        return redirect()->route('periksa-pasien.index')->with('success', 'Data periksa berhasil disimpan.');
+        return redirect()->route('periksa-pasien.index')
+            ->with('success', 'Data periksa berhasil disimpan.');
     }
 }

@@ -25,12 +25,14 @@ class ObatController extends Controller
             'nama_obat' => 'required|string',
             'kemasan'   => 'required|string',
             'harga'     => 'required|integer',
+            'stok'      => 'required|integer|min:0',  
         ]);
 
         Obat::create([
             'nama_obat' => $request->nama_obat,
             'kemasan'   => $request->kemasan,
             'harga'     => $request->harga,
+            'stok'      => $request->stok,             // ← TAMBAHAN
         ]);
 
         return redirect()->route('obat.index')
@@ -41,9 +43,7 @@ class ObatController extends Controller
     public function edit(string $id)
     {
         $obat = Obat::findOrFail($id);
-        return view('admin.obat.edit')->with([
-            'obat' => $obat
-        ]);
+        return view('admin.obat.edit', compact('obat'));
     }
 
     public function update(Request $request, string $id)
@@ -52,6 +52,7 @@ class ObatController extends Controller
             'nama_obat' => 'required|string',
             'kemasan'   => 'nullable|string',
             'harga'     => 'required|integer',
+            'stok'      => 'required|integer|min:0',   // ← TAMBAHAN
         ]);
 
         $obat = Obat::findOrFail($id);
@@ -59,6 +60,7 @@ class ObatController extends Controller
             'nama_obat' => $request->nama_obat,
             'kemasan'   => $request->kemasan,
             'harga'     => $request->harga,
+            'stok'      => $request->stok,             // ← TAMBAHAN
         ]);
 
         return redirect()->route('obat.index')
@@ -73,6 +75,49 @@ class ObatController extends Controller
 
         return redirect()->route('obat.index')
             ->with('message', 'Data Obat Berhasil di Hapus')
+            ->with('type', 'success');
+    }
+
+    // ==========================================
+    // TAMBAH STOK MANUAL OLEH ADMIN
+    // ==========================================
+    public function tambahStok(Request $request, string $id)
+    {
+        $request->validate([
+            'jumlah' => 'required|integer|min:1',
+        ]);
+
+        $obat = Obat::findOrFail($id);
+        $obat->stok += $request->jumlah;
+        $obat->save();
+
+        return redirect()->route('obat.index')
+            ->with('message', 'Stok obat berhasil ditambah sebanyak ' . $request->jumlah)
+            ->with('type', 'success');
+    }
+
+    // ==========================================
+    // KURANGI STOK MANUAL OLEH ADMIN
+    // ==========================================
+    public function kurangiStok(Request $request, string $id)
+    {
+        $request->validate([
+            'jumlah' => 'required|integer|min:1',
+        ]);
+
+        $obat = Obat::findOrFail($id);
+
+        if ($obat->stok < $request->jumlah) {
+            return redirect()->back()
+                ->with('message', 'Gagal! Stok tidak mencukupi. Stok tersedia: ' . $obat->stok)
+                ->with('type', 'error');
+        }
+
+        $obat->stok -= $request->jumlah;
+        $obat->save();
+
+        return redirect()->route('obat.index')
+            ->with('message', 'Stok obat berhasil dikurangi sebanyak ' . $request->jumlah)
             ->with('type', 'success');
     }
 }

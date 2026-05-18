@@ -10,7 +10,9 @@ class PoliController extends Controller
 {
     public function index()
     {
-        $polis = Poli::all();
+        // Eager load dokters dan jadwal praktek mereka
+        // supaya tidak terjadi query N+1 saat view menampilkan jadwal tiap dokter
+        $polis = Poli::with(['dokters.jadwalPeriksa'])->get();
         return view('admin.polis.index', compact('polis'));
     }
 
@@ -22,12 +24,14 @@ class PoliController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_poli' => 'required',
+            'nama_poli'  => 'required',
             'keterangan' => 'nullable',
         ]);
 
         Poli::create($validated);
-        return redirect()->route('polis.index')->with('success', 'Poli berhasil ditambahkan')->with('type', 'success');
+        return redirect()->route('polis.index')
+            ->with('success', 'Poli berhasil ditambahkan')
+            ->with('type', 'success');
     }
 
     public function edit($id)
@@ -39,19 +43,23 @@ class PoliController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'nama_poli' => 'required',
+            'nama_poli'  => 'required',
             'keterangan' => 'nullable',
         ]);
 
         $poli = Poli::findOrFail($id);
         $poli->update($validated);
-        return redirect()->route('polis.index')->with('success', 'Poli berhasil di update');
+        return redirect()->route('polis.index')
+            ->with('success', 'Poli berhasil di update')
+            ->with('type', 'success');
     }
 
     public function destroy($id)
     {
         $poli = Poli::findOrFail($id);
         $poli->delete();
-        return redirect()->route('polis.index')->with('success', 'Poli Berhasil di hapus !');
+        return redirect()->route('polis.index')
+            ->with('success', 'Poli Berhasil di hapus !')
+            ->with('type', 'success');
     }
 }
